@@ -14,4 +14,4 @@ RUN pip install --no-cache-dir flask
 EXPOSE 80
 
 # Define the command to run your app
-CMD ["python", "app.py"]
+CMD ["flask", "run", "--host=0.0.0.0", "--port=8080"]
