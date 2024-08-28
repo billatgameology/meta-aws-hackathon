@@ -2,15 +2,23 @@ from langchain_aws import ChatBedrock
 from langchain_core.messages import HumanMessage
 
 
-chat = ChatBedrock(
-    model_id="anthropic.claude-3-sonnet-20240229-v1:0",
-    model_kwargs={"temperature": 0.1},
-)
-
-messages = [
-    HumanMessage(
-        content="Translate this sentence from English to French. I love programming."
+def translate_to_french(text):
+    chat = ChatBedrock(
+        model_id="anthropic.claude-3-sonnet-20240229-v1:0",
+        model_kwargs={"temperature": 0.1},
     )
-]
 
-print(chat.invoke(messages))
+    messages = [
+        HumanMessage(
+            content=f"Translate this sentence from English to French: {text}"
+        )
+    ]
+
+    response = chat.invoke(messages)
+    return response
+
+# Example usage
+if __name__ == "__main__":
+    text = "I love programming."
+    translation = translate_to_french(text)
+    print(translation)
