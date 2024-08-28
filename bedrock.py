@@ -18,7 +18,7 @@ def translate_to_french(text):
     translation = response.content if hasattr(response, 'content') else str(response)
     return translation
 
-if __name__ == "__main__":
-    text = "Hello, how are you?"
-    translation = translate_to_french(text)
-    print(translation)
+# if __name__ == "__main__":
+#     text = "Hello, how are you?"
+#     translation = translate_to_french(text)
+#     print(translation)

@@ -1,6 +1,8 @@
 import os
 from flask import Flask, request, jsonify
-from bedrock import translate_to_french
+from langchain_aws import ChatBedrock
+from langchain_core.messages import HumanMessage
+
 
 app = Flask(__name__)
 
@@ -10,13 +12,28 @@ def ping():
 
 @app.route('/translate', methods=['POST'])
 def translate():
+    chat = ChatBedrock(
+        model_id="anthropic.claude-3-sonnet-20240229-v1:0",
+        model_kwargs={"temperature": 0.1},
+    )
+
     try:
         data = request.get_json()
         text = data.get('text')
         if not text:
             return jsonify({"error": "No text provided"}), 400
 
-        translation = translate_to_french(text)
+        
+        messages = [
+            HumanMessage(
+                content=f"Translate this sentence from English to French: {text}"
+            )
+        ]
+        
+        response = chat.invoke(messages)
+        # Extract the content field from the response
+        translation = response.content if hasattr(response, 'content') else str(response)    
+        
         return jsonify({"translation": translation}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
