@@ -3,8 +3,11 @@ import logging
 from flask import Flask, request, jsonify
 from langchain_aws import ChatBedrock
 from langchain_core.messages import HumanMessage
+from flaskcors import CORS
 
 app = Flask(__name__)
+
+CORS(app, origins=["https://localhost:5173"])
 
 # Configure logging based on environment variable
 debug_mode = os.getenv('DEBUG', 'false').lower() == 'true'
@@ -53,25 +56,51 @@ def describe_image():
     base64_image = data.get('base64_image')
     return describe_image_from_base64(base64_image)
 
-from bedrockSD import generate_image_from_description
+from bedrock import lambda_handler  # Import the lambda_handler function from bedrock.py
+import json
+import base64
 
 @app.route('/generate_image', methods=['POST'])
 def generate_image():
     data = request.get_json()
     base64_image = data.get('base64_image')
-    prompt = describe_image_from_base64(base64_image)
+    prompt = str(describe_image_from_base64(base64_image))
+    sanitized_prompt = sanitize_prompt(prompt)
     
-    if not prompt:
-            return jsonify({'error': 'No prompt provided'}), 400
+    event = {
+    'body': json.dumps({'prompt': sanitized_prompt})
+}
+    context = {}
+    response = lambda_handler(event, context)
 
-    base64_image_data = generate_image_from_description(prompt)
-    
-    if not base64_image_data:
-            return jsonify({'error': 'Image generation failed'}), 500
 
-    print(f"Response data: {base64_image_data}")
+    # Save the image from the response body
+    response_body = json.loads(response['body'])
+    base64_image_data = response_body['data']
+    image_bytes = base64.b64decode(base64_image_data)
+
+    with open('generated_image.png', 'wb') as image_file:
+        image_file.write(image_bytes)
+    print("Image saved as 'generated_image.png'")
+
+    return jsonify({"base64_image": base64_image_data}), 200
+
+def sanitize_prompt(prompt):
+    # Remove leading and trailing whitespace
+    prompt = prompt.strip()
     
-    return jsonify({'base64_image': base64_image_data}), 200
+    # Replace newlines and tabs with spaces
+    prompt = prompt.replace('\n', ' ').replace('\t', ' ')
+    
+    # Remove any double quotes to prevent JSON issues
+    prompt = prompt.replace('"', '')
+    
+    # Optionally, limit the length of the prompt
+    max_length = 500  # You can adjust this value
+    if len(prompt) > max_length:
+        prompt = prompt[:max_length] + '...'
+    
+    return prompt
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 8080))  

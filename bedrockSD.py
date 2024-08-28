@@ -22,27 +22,5 @@ def generate_image_from_description(prompt):
         body=json.dumps(payload)
     )
 
-    # # Handle the response from the model
-    # print(response.keys())
-    # image_data = response['body'].read().decode('utf-8')
-    # # Upload the generated image to Amazon S3
-    # key = f'generated-image.png'
-
-    # return {
-    #     'statusCode': 200,
-    #     'body': json.dumps({'data':image_data,'name':key}),
-    #     'headers': {
-    #         'Access-Control-Allow-Origin': '*'
-    #     }
-    # }
-    
-    
-
- # Handle the response from the model
-    response_body = response['body'].read().decode('utf-8')
-    response_data = json.loads(response_body)
-
-    # Extract the base64 string of the generated image
-    base64_image_data = response_data['artifacts'][0]['base64']
 
     return base64_image_data
