@@ -10,10 +10,17 @@ def ping():
 
 @app.route('/translate', methods=['POST'])
 def translate():
-    data = request.json
-    text = data.get('text', '')
-    translation = translate_to_french(text)
-    return jsonify({"translation": translation})
+    try:
+        data = request.get_json()
+        text = data.get('text')
+        if not text:
+            return jsonify({"error": "No text provided"}), 400
+
+        translation = translate_to_french(text)
+        return jsonify({"translation": translation}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 8080))  
