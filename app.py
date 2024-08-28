@@ -1,6 +1,6 @@
 import os
 from flask import Flask, request, jsonify
-from bedrocktest import get_style_options
+#from bedrocktest import get_style_options
 
 
 app = Flask(__name__)
