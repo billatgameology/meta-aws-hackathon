@@ -3,11 +3,11 @@ import logging
 from flask import Flask, request, jsonify
 from langchain_aws import ChatBedrock
 from langchain_core.messages import HumanMessage
-from flaskcors import CORS
+#from flaskcors import CORS
 
 app = Flask(__name__)
 
-CORS(app, origins=["https://localhost:5173"])
+#CORS(app, origins=["https://localhost:5173"])
 
 # Configure logging based on environment variable
 debug_mode = os.getenv('DEBUG', 'false').lower() == 'true'
@@ -15,7 +15,6 @@ log_level = os.getenv('LOG_LEVEL', 'DEBUG' if debug_mode else 'INFO').upper()
 
 logging.basicConfig(level=log_level)
 logger = logging.getLogger(__name__)
-
 
 @app.route('/ping', methods=['GET'])
 def ping():
@@ -54,7 +53,9 @@ from util import describe_image_from_base64
 def describe_image():
     data = request.get_json()
     base64_image = data.get('base64_image')
-    return describe_image_from_base64(base64_image)
+    description = describe_image_from_base64(base64_image)
+    return jsonify({"image_description": description}), 200
+
 
 from bedrock import lambda_handler  # Import the lambda_handler function from bedrock.py
 import json
@@ -67,23 +68,22 @@ def generate_image():
     prompt = str(describe_image_from_base64(base64_image))
     sanitized_prompt = sanitize_prompt(prompt)
     
+    print(sanitized_prompt)
+    
     event = {
     'body': json.dumps({'prompt': sanitized_prompt})
 }
     context = {}
     response = lambda_handler(event, context)
 
-
     # Save the image from the response body
     response_body = json.loads(response['body'])
     base64_image_data = response_body['data']
-    image_bytes = base64.b64decode(base64_image_data)
 
-    with open('generated_image.png', 'wb') as image_file:
-        image_file.write(image_bytes)
-    print("Image saved as 'generated_image.png'")
-
-    return jsonify({"base64_image": base64_image_data}), 200
+    return jsonify({
+        "base64_image": base64_image_data,
+        "prompt": sanitized_prompt
+    }), 200
 
 def sanitize_prompt(prompt):
     # Remove leading and trailing whitespace

@@ -41,20 +41,20 @@ def lambda_handler(event, context):
     }
 
 
-if __name__ == '__main__':
-    # Test case 1: Valid prompt
-    event = {
-        'body': json.dumps({'prompt': 'A beautiful sunset over the ocean'})
-    }
-    context = {}
-    response = lambda_handler(event, context)
-    print(f"Test case 1 response: {response}")
+# if __name__ == '__main__':
+#     # Test case 1: Valid prompt
+#     event = {
+#         'body': json.dumps({'prompt': 'A beautiful sunset over the ocean'})
+#     }
+#     context = {}
+#     response = lambda_handler(event, context)
+#     #print(f"Test case 1 response: {response}")
 
-    # Save the image from the response body
-    response_body = json.loads(response['body'])
-    base64_image_data = response_body['data']
-    image_bytes = base64.b64decode(base64_image_data)
+#     # Save the image from the response body
+#     response_body = json.loads(response['body'])
+#     base64_image_data = response_body['data']
+#     image_bytes = base64.b64decode(base64_image_data)
 
-    with open('generated_image.png', 'wb') as image_file:
-        image_file.write(image_bytes)
-    print("Image saved as 'generated_image.png'")
+#     with open('generated_image.png', 'wb') as image_file:
+#         image_file.write(image_bytes)
+#     print("Image saved as 'generated_image.png'")

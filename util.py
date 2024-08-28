@@ -33,7 +33,8 @@ def describe_image_from_base64(base64_image):
     try:
         response = chat.invoke(messages)
         image_description = response.content if hasattr(response, 'content') else str(response)
-        return jsonify({'image_description': image_description}), 200
+        return image_description
+    
     except Exception as e:
         logger.error(f"Error during image description: {str(e)}")
         return jsonify({'error': str(e)}), 500
