@@ -1,10 +1,18 @@
 import os
+import logging
 from flask import Flask, request, jsonify
 from langchain_aws import ChatBedrock
 from langchain_core.messages import HumanMessage
 
-
 app = Flask(__name__)
+
+# Configure logging based on environment variable
+debug_mode = os.getenv('DEBUG', 'false').lower() == 'true'
+log_level = os.getenv('LOG_LEVEL', 'DEBUG' if debug_mode else 'INFO').upper()
+
+logging.basicConfig(level=log_level)
+logger = logging.getLogger(__name__)
+
 
 @app.route('/ping', methods=['GET'])
 def ping():
@@ -23,7 +31,6 @@ def translate():
         if not text:
             return jsonify({"error": "No text provided"}), 400
 
-        
         messages = [
             HumanMessage(
                 content=f"Translate this sentence from English to French: {text}"
@@ -37,7 +44,6 @@ def translate():
         return jsonify({"translation": translation}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 8080))  
