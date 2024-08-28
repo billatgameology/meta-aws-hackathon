@@ -1,4 +1,4 @@
-from langchain_aws import ChatBedrock
+from langchain-aws import ChatBedrock
 from langchain_core.messages import HumanMessage
 
 def translate_to_french(text):
