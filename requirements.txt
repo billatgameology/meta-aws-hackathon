@@ -2,3 +2,6 @@ langchain_core
 langchain-aws
 Flask
 requests
+diffusers
+pillow
+boto3
