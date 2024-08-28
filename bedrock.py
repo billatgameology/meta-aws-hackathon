@@ -1,4 +1,4 @@
-from langchain-aws import ChatBedrock
+from langchain_aws import ChatBedrock
 from langchain_core.messages import HumanMessage
 
 def translate_to_french(text):
@@ -15,3 +15,8 @@ def translate_to_french(text):
 
     response = chat.invoke(messages)
     return response
+
+if __name__ == "__main__":
+    text = "Hello, how are you?"
+    translation = translate_to_french(text)
+    print(translation)
