@@ -9,12 +9,12 @@ app = Flask(__name__)
 def ping():
     return 'Hello, World!'
 
-@app.route('/styles', methods=['POST'])
-def styles():
-    data = request.json
-    customer_input = data.get('customer_input', '')
-    styles = get_style_options(customer_input)
-    return jsonify(styles)
+# @app.route('/styles', methods=['POST'])
+# def styles():
+#     data = request.json
+#     customer_input = data.get('customer_input', '')
+#     styles = get_style_options(customer_input)
+#     return jsonify(styles)
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 8080))  
